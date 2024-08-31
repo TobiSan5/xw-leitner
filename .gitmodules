@@ -1,0 +1,3 @@
+[submodule "xw-core"]
+	path = xw-core
+	url = https://github.com/TobiSan5/xw-core
