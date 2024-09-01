@@ -1,2 +1,5 @@
 # exclude files inside the db folder
 db/**
+
+# exclude files inside the db folder
+img/**
