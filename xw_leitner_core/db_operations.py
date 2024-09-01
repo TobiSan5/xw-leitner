@@ -26,6 +26,7 @@ def get_db_session():
     finally:
         session.close()
 
+
 def main():
     raise NotImplementedError
 
