@@ -1,3 +1,6 @@
+# exclude temporary files created by the file system
+~*
+
 # exclude files inside the db folder
 db/**
 

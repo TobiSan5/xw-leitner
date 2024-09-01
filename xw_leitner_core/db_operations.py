@@ -1,25 +1,32 @@
+from contextlib import contextmanager
+import os
 from pathlib import Path
+from typing import Tuple
 
 import sqlalchemy as sa
 from sqlalchemy import orm as sa_orm
-import sqlite3
 import xlwings as xw
 
 THIS_DIR = Path(__file__).parent
 PROJ_DIR = THIS_DIR.parent
-DB_FPATH = PROJ_DIR / "db/students.db"
-DB_URL = f"sqlite:///{str(DB_FPATH)}"
+DB_PATH = os.getenv("XW-LEITNER-DB-DIR")
 XLSM_FPATH = PROJ_DIR / "xlsm/leitner_02.xlsm"
 
-engine = sa.create_engine(DB_URL, echo=True)
-SessionLocal = sa_orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def get_db_url(db_filename: str) -> str:
+    if not DB_PATH:
+        raise EnvironmentError("Environment variable XW-LETINER-DB-DIR not set or empty.")
+    return f"sqlite:///{str(Path(DB_PATH) / db_filename)}"
 
-# Declare a base for your models
-Base = sa_orm.declarative_base()
+def get_engine(db_filename: str) -> Tuple[sa.engine.Engine, str]:
+    db_url = get_db_url(db_filename)
+    engine = sa.create_engine(db_url, echo=True)
+    return (engine, db_url)
 
 
-def get_db_session():
+@contextmanager
+def get_session(engine: sa.engine.Engine) -> sa_orm.Session:
     """Create a new database session."""
+    SessionLocal = sa_orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = SessionLocal()
     try:
         yield session
@@ -32,13 +39,7 @@ def main():
 
 
 def test():
-    wb = xw.Book.caller()
-    sh1 = wb.sheets[0]
-    sh1_a1 = sh1["A1"]
-    if sh1_a1.value == "You" or not sh1_a1.value:
-        sh1_a1.value = "Hello"
-    else:
-        sh1_a1.value = "You"
+    pass
 
 
 if __name__ == "__main__":
